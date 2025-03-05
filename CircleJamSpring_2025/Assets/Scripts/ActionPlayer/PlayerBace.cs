@@ -35,7 +35,7 @@ public class PlayerBace : MonoBehaviour
         {
             if (isInSky == false)
             {
-                rb.velocity = new Vector2(rb.velocity.x, 5);
+                rb.velocity = new Vector2(rb.velocity.x, 15);
                 isInSky = true;
             }
             else if (rb.velocity.magnitude != 0 && isInSky == true && jumpLimit == 1)
@@ -52,9 +52,8 @@ public class PlayerBace : MonoBehaviour
         rb.gravityScale = 0f;
         rb.velocity = new Vector2(rb.velocity.x, 0);
         yield return new WaitForSeconds(1);
-        rb.gravityScale = 1.0f;
+        rb.gravityScale = 2.0f;
         print("ëÿãÛèIóπ");
     }
-
 
 }
