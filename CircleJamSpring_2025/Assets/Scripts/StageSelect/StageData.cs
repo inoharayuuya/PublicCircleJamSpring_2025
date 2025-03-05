@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using UnityEngine;
 
 [Serializable]
 public class StageData
@@ -14,7 +15,8 @@ public class StageData
 [Serializable]
 public class Stage
 {
-    public string stage_id;         // ステージID
-    public string stage_name;       // ステージ名
-    public bool   is_stage_clear;   // ステージをクリアしているかどうか
+    public string  stage_id;        // ステージID
+    public string  stage_name;      // ステージ名
+    public bool    is_stage_clear;  // ステージをクリアしているかどうか
+    public Vector3 position;        // ステージの実体を置く位置(World座標)
 }

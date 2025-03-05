@@ -1,7 +1,6 @@
 using UnityEditor;
 using UnityEngine;
 using System.IO;
-using System.Collections.Generic;
 
 public class StageDataEditor : EditorWindow
 {
@@ -44,9 +43,17 @@ public class StageDataEditor : EditorWindow
         {
             GUILayout.BeginVertical("box");
 
+            // “ü—Í•”•ª
             stageData.list_stage[i].stage_id = EditorGUILayout.TextField("Stage ID", stageData.list_stage[i].stage_id);
             stageData.list_stage[i].stage_name = EditorGUILayout.TextField("Stage Name", stageData.list_stage[i].stage_name);
             stageData.list_stage[i].is_stage_clear = EditorGUILayout.Toggle("Stage Clear", stageData.list_stage[i].is_stage_clear);
+            
+            GUILayout.Label("Stage Position"); 
+            var x = float.Parse(EditorGUILayout.TextField("    x", stageData.list_stage[i].position.x.ToString()));
+            var y = float.Parse(EditorGUILayout.TextField("    y", stageData.list_stage[i].position.y.ToString()));
+            var z = float.Parse(EditorGUILayout.TextField("    z", stageData.list_stage[i].position.z.ToString()));
+
+            stageData.list_stage[i].position = new Vector3(x,y,z);
 
             if (GUILayout.Button("Remove Stage"))
             {
