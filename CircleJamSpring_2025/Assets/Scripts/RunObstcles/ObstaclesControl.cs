@@ -9,7 +9,7 @@ public class ObstaclesControl : MonoBehaviour
     public Soldier soldier;
     public GameObject sun;                       //動かす太陽
     public Vector3 move = new Vector3(1, 0, 0);  //動かす方向
-    public float speed = 3.0f;                   //プレイヤー移動用
+    public float speed = 3.0f;                 //プレイヤー移動用
     public float moveDistance = 1.0f;            //移動距離
     public float moveSpeed = 1.5f;               //移動速度（数値を小さくするとゆっくり）
     public int moveCount;                        //太陽の動いた数
