@@ -1,0 +1,14 @@
+{
+    "list_stage": [
+        {
+            "stage_id": "1",
+            "stage_name": "test",
+            "is_stage_clear": false
+        },
+        {
+            "stage_id": "2",
+            "stage_name": "test",
+            "is_stage_clear": false
+        }
+    ]
+}
