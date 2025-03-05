@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -7,132 +5,159 @@ public class SkillWheelController : MonoBehaviour
 {
     public Image[] skillImages;  // スキルアイコンのImage
     public Text skillInfoText;    // 中央のスキル名を表示するText
-    public Text[] cooldownTexts;  // 各スキルのクールタイム残り時間を表示するText
-    public float animationDuration = 0.2f;  // アニメーションの時間
+    // public Text[] cooldownTexts; // 各スキルのクールタイムを表示するText
+    public SkillData[] skillData; // スキルデータ（ScriptableObject）
+    private int currentIndex = 2; // 中央のスキル位置
 
-    private int currentIndex = 2;  // 初期位置（中央のスキル）
-    public SkillData[] skillData;  // スキルデータ（ScriptableObject）
-    private float[] skillCooldowns;  // 各スキルのクールタイム
-
-        float moveUI = 1920f;
-    float moveSpeed = 10f;
-    int nowGame = 0;
-    int maxGame = 9;
+    public Vector3[] initPos;
 
     void Start()
     {
-        skillCooldowns = new float[skillData.Length];  // クールタイムの初期化
-        SetSkillsInstantly();  // 初回のみ即座にセット
+        initPos = new Vector3[skillImages.Length];
+        for(int i=0;i<skillImages.Length;i++)
+        {
+            initPos[i]=skillImages[i].gameObject.GetComponent<RectTransform>().anchoredPosition;
+        }
+        UpdateSkillDisplay();
     }
 
     void Update()
     {
-        for (int i = 0; i < skillCooldowns.Length; i++)
-        {
-            if (skillCooldowns[i] > 0)
-            {
-                skillCooldowns[i] -= Time.deltaTime;
-            }
-        }
-
         if (Input.GetAxis("Mouse ScrollWheel") > 0f)
         {
-            SwitchSkills(1);  // 右にスライド
+            RotateWheel(1); // 右スクロール
         }
         else if (Input.GetAxis("Mouse ScrollWheel") < 0f)
         {
-            SwitchSkills(-1);  // 左にスライド
+            RotateWheel(-1); // 左スクロール
         }
 
+        // Eキーでスキル発動
         if (Input.GetKeyDown(KeyCode.E))
         {
             ActivateSkill();
         }
 
-        UpdateCooldownText();
-    }
-
-    void SetSkillsInstantly()
-    {
-        for (int i = 0; i < skillImages.Length; i++)
+        // クールタイムの更新処理（ここでは仮に時間が経過する例として1秒減少）
+        for (int i = 0; i < skillData.Length; i++)
         {
-            skillImages[i].sprite = skillData[i].skillImage;
-            UpdateSkillAppearance(i);
-        }
-    }
-
-    void SwitchSkills(int direction)
-    {
-        int previousIndex = currentIndex;
-        currentIndex = (currentIndex + direction + skillImages.Length) % skillImages.Length;
-        StartCoroutine(AnimateSkillSwitch(previousIndex, currentIndex));
-    }
-
-    void UpdateSkillAppearance(int index)
-    {
-        int distance = Mathf.Abs(index - currentIndex);
-        if (distance > skillImages.Length / 2) distance = skillImages.Length - distance;
-
-        skillImages[index].transform.localScale = (index == currentIndex) ? new Vector3(1.5f, 1.5f, 1) : new Vector3(1f, 1f, 1);
-        skillImages[index].rectTransform.pivot = (index == currentIndex) ? new Vector2(0.5f, 0.325f) : new Vector2(0.5f, 0.5f);
-
-        Color color = skillImages[index].color;
-        color.a = (distance == 0) ? 1.0f : (distance == 1) ? 0.5f : 0.0f;
-        skillImages[index].color = color;
-    }
-
-    IEnumerator AnimateSkillSwitch(int previousIndex, int newIndex)
-    {
-        float elapsedTime = 0f;
-        Vector3 previousScale = skillImages[previousIndex].transform.localScale;
-        Vector3 newScale = new Vector3(1.5f, 1.5f, 1);
-        Vector3 defaultScale = new Vector3(1f, 1f, 1);
-
-        while (elapsedTime < animationDuration)
-        {
-            elapsedTime += Time.deltaTime;
-            float t = elapsedTime / animationDuration;
-
-            skillImages[previousIndex].transform.localScale = Vector3.Lerp(previousScale, defaultScale, t);
-            skillImages[newIndex].transform.localScale = Vector3.Lerp(defaultScale, newScale, t);
-
-            yield return null;
-        }
-
-        skillImages[previousIndex].transform.localScale = defaultScale;
-        skillImages[newIndex].transform.localScale = newScale;
-
-        for (int i = 0; i < skillImages.Length; i++)
-        {
-            UpdateSkillAppearance(i);
-        }
-        UpdateSkillText(newIndex);
-    }
-
-    void UpdateSkillText(int index)
-    {
-        if (index == currentIndex && skillInfoText != null)
-        {
-            skillInfoText.text = skillData[index].skillName;
-        }
-    }
-
-    void UpdateCooldownText()
-    {
-        for (int i = 0; i < cooldownTexts.Length; i++)
-        {
-            if (cooldownTexts[i] != null)
+            if (skillData[i].coolTime > 0)
             {
-                cooldownTexts[i].text = skillCooldowns[i] > 0 ? skillCooldowns[i].ToString("F1") + "s" : "";
+                skillData[i].coolTime -= Time.deltaTime;
+                // cooldownTexts[i].text = skillData[i].coolTime.ToString("F1"); // クールタイム表示
+            }
+            else
+            {
+                // cooldownTexts[i].text = " "; // クールタイムが終了したら空白
             }
         }
     }
 
-    public void ActivateSkill()
+    void RotateWheel(int direction)
     {
-        if (skillCooldowns[currentIndex] <= 0)
+        for(int i = 0; i <skillImages.Length;i++)
         {
-            skillCooldowns[currentIndex] = skillData[currentIndex].skillCoolTime;
+            if(i+direction >= skillImages.Length)
+            {
+                skillImages[i].gameObject.GetComponent<RectTransform>().anchoredPosition = initPos[0];
+                print($"{i} = {skillImages[i].gameObject.name}");
+                continue;
+            }
+            if(i+direction < 0)
+            {
+                skillImages[i].gameObject.GetComponent<RectTransform>().anchoredPosition = initPos[skillImages.Length-1];
+                continue;
+            }
+            skillImages[i].gameObject.GetComponent<RectTransform>().anchoredPosition = initPos[i+direction];
         }
+        if (direction == 1)
+        {
+            // 右スクロール: 最後の要素を先頭に移動
+
+            Image lastImage = skillImages[skillImages.Length - 1];
+            for (int i = skillImages.Length - 1; i > 0; i--)
+            {
+                skillImages[i] = skillImages[i - 1];
+            }
+            skillImages[0] = lastImage;
+            // 右スクロール: 最後の要素を先頭に移動
+
+            SkillData last = skillData[skillData.Length - 1];
+            for (int i = skillData.Length - 1; i > 0; i--)
+            {
+                skillData[i] = skillData[i - 1];
+            }
+            skillData[0] = last;
+        }
+        else if (direction == -1)
+        {
+            // 左スクロール: 先頭の要素を最後に移動
+            Image firstImage = skillImages[0];
+            for (int i = 0; i < skillImages.Length - 1; i++)
+            {
+                skillImages[i] = skillImages[i + 1];
+            }
+            skillImages[skillImages.Length - 1] = firstImage;
+            // 左スクロール: 先頭の要素を最後に移動
+            SkillData first = skillData[0];
+            for (int i = 0; i < skillData.Length - 1; i++)
+            {
+                skillData[i] = skillData[i + 1];
+            }
+            skillData[skillData.Length - 1] = first;
+        }
+
+        UpdateSkillDisplay();
+    }
+
+    void UpdateSkillDisplay()
+    {
+        for (int i = 0; i < skillImages.Length; i++)
+        {
+            skillImages[i].sprite = skillData[i].skillImage;
+
+            // 透明度とサイズの更新
+            if (i == currentIndex)
+            {
+                // 中央: 完全に表示、サイズは1.5倍
+                skillImages[i].color = new Color(1, 1, 1, 1); // 透明度1.0
+                // cooldownTexts[i].color = new Color(1, 1, 1, 1); // 透明度1.0
+                skillImages[i].transform.localScale = new Vector3(1.5f, 1.5f, 1);
+            }
+            else if (i == (currentIndex - 1 + skillImages.Length) % skillImages.Length || i == (currentIndex + 1) % skillImages.Length)
+            {
+                // 左右: 半透明、サイズは通常
+                skillImages[i].color = new Color(1, 1, 1, 0.5f); // 透明度0.5
+                // cooldownTexts[i].color = new Color(1, 1, 1, 0.5f); // 透明度0.5
+                skillImages[i].transform.localScale = Vector3.one;
+            }
+            else
+            {
+                // 端: 非表示、サイズは通常
+                skillImages[i].color = new Color(1, 1, 1, 0.0f); // 透明度0.0
+                // cooldownTexts[i].color = new Color(1, 1, 1, 0.0f); // 透明度0.0
+                skillImages[i].transform.localScale = Vector3.one;
+            }
+        }
+
+        skillInfoText.text = skillData[currentIndex].skillName;
+    }
+
+    void ActivateSkill()
+    {
+        // 中央のスキルがクールタイム中でなければ発動
+        if (skillData[currentIndex].coolTime <= 0)
+        {
+            skillData[currentIndex].coolTime = skillData[currentIndex].skillCoolTime; // クールタイム開始
+            // 発動処理（例: スキルのエフェクトや効果を実行）
+            Debug.Log($"{skillData[currentIndex].skillName} 発動！");
+        }
+        else
+        {
+            Debug.Log($"{skillData[currentIndex].skillName} はまだクールタイム中です。");
+        }
+
+        // 発動直後にクールタイムを表示する
+        // cooldownTexts[currentIndex].text = skillData[currentIndex].coolTime.ToString("F1");
     }
 }
