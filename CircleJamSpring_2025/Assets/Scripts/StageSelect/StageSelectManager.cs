@@ -194,7 +194,6 @@ public class StageSelectManager : MonoBehaviour
         isMove = false;
 
         // 最初に選択されているステージのα値を変える
-        print($"test:{stageNameObject[0]}");
         stageNameObject[0].GetComponent<Image>().color = Common.MAX_ALPHA;
 
         // キャラの初期座標をセット
