@@ -674,7 +674,7 @@ public class StageSelectManager : MonoBehaviour
         {
             case StageType.Action:
                 print("このステージのタイプはActionです");
-                //Common.LoadScene("Action");
+                Common.LoadScene("ActionPlayer");
                 break;
 
             case StageType.Run:

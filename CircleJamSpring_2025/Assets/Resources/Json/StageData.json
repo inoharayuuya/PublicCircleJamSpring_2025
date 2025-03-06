@@ -2,7 +2,7 @@
     "list_stage": [
         {
             "stage_id": "stage-0001",
-            "stage_name": "チュートリアル",
+            "stage_name": "ステージ1",
             "is_stage_clear": true,
             "stage_type": 1,
             "position": {
@@ -13,23 +13,12 @@
         },
         {
             "stage_id": "stage-0002",
-            "stage_name": "stage2",
+            "stage_name": "ステージ2",
             "is_stage_clear": true,
             "stage_type": 0,
             "position": {
                 "x": 3.0,
-                "y": 0.0,
-                "z": 0.0
-            }
-        },
-        {
-            "stage_id": "stage-0003",
-            "stage_name": "stage3",
-            "is_stage_clear": true,
-            "stage_type": 1,
-            "position": {
-                "x": 6.0,
-                "y": 0.0,
+                "y": 3.0,
                 "z": 0.0
             }
         }
