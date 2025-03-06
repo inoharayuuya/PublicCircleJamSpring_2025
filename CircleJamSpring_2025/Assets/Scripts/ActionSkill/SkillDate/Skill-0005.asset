@@ -17,6 +17,6 @@ MonoBehaviour:
   skillType: 4
   skillCoolTime: 15
   unLockSkill: 5
-  coolTime: 0
-  skillImage: {fileID: 21300000, guid: fc79d73428199d145806b10b6b2eb7d4, type: 3}
-  skillAction: {fileID: 11400000, guid: 1dd3361ce593c24479d65894256d905c, type: 2}
+  coolTime: 0.4356055
+  skillImage: {fileID: 21300000, guid: 0389074d1deba1c448d45812db40c0df, type: 3}
+  skillAction: {fileID: 0}
