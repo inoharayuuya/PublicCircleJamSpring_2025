@@ -6,7 +6,11 @@ using UnityEngine.UI;
 
 public class ActionPlayer : PlayerBace
 {
-    float speed;
+    [Tooltip("ë¨ìx")] public float speed;
+    [Tooltip("HP")]   public float healthPoint;
+
+    GameObject child;
+    public bool attackDelay;
 
 
     // Start is called before the first frame update
@@ -18,7 +22,7 @@ public class ActionPlayer : PlayerBace
     // Update is called once per frame
     void Update()
     {
-        Jump();
+        CheckKey();
         Move();
         Attack();
     }
@@ -37,7 +41,11 @@ public class ActionPlayer : PlayerBace
         print("è’ìÀíÜ");
         if (collision.tag == "Obstacle")
         {
-            collision.gameObject.GetComponent<Obstacle>().Amount();
+            healthPoint = collision.gameObject.GetComponent<Obstacle>().Amount(healthPoint);
+            if (collision.gameObject.GetComponent<Obstacle>().isObstacleDisabled == true)
+            {
+                Destroy(collision.gameObject);
+            }
         }
 
     }
@@ -66,6 +74,11 @@ public class ActionPlayer : PlayerBace
     void InitActionPlayer()
     {
         rb = GetComponent<Rigidbody2D>();
+        child = gameObject.transform.GetChild(0).gameObject;
+
+        jumpAmount = 15f;
+        flightTime = 1f;
+
     }
 
 
@@ -74,25 +87,44 @@ public class ActionPlayer : PlayerBace
         // à⁄ìÆèàóù
         if (Input.GetKey(KeyCode.D))
         {
-            rb.velocity = new Vector2(3f, rb.velocity.y);
+            transform.eulerAngles = new Vector3(0, 0, 0);
+            rb.velocity = new Vector2(speed, rb.velocity.y);
         }
         if (Input.GetKey(KeyCode.A))
         {
-            rb.velocity = new Vector2(-3f, rb.velocity.y);
+            transform.eulerAngles = new Vector3(0, 180, 0);
+            rb.velocity = new Vector2(-speed, rb.velocity.y);
         }
     }
 
 
     void Attack()
     {
-        print("çUåÇ");
         // çUåÇèàóù
-        if (Input.GetMouseButtonDown(0))
+        if (Input.GetMouseButtonDown(0) && attackDelay == false)
         {
-            
-        }
+            child.gameObject.transform.parent = null;
+            attackDelay = true;
+            print("çUåÇ");
 
+            StartCoroutine(NailAttack());
+        }
     }
+
+    IEnumerator NailAttack()
+    {
+        child.SetActive(true);
+        // çUåÇèàóù
+
+
+        yield return new WaitForSeconds(0.5f);
+        child.SetActive(false);
+        child.gameObject.transform.parent = gameObject.transform;
+        child.transform.localPosition = new Vector2(1f, 0);
+        yield return new WaitForSeconds(0.5f);
+        attackDelay = false;
+    }
+
 
 
     void UseSkill()
@@ -104,6 +136,17 @@ public class ActionPlayer : PlayerBace
     void SelectSkill()
     {
         //  ÉXÉLÉãëIë
+    }
+
+
+    public float GetJumpAmount()
+    {
+        return jumpAmount;
+    }
+
+    public void StratJump(float jumpAmount)
+    {
+        Jump(jumpAmount);
     }
 
 

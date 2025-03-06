@@ -28,7 +28,7 @@ public class Obstacle : MonoBehaviour
 
     void Init()
     {
-        isObstacleDisabled = false;
+        isFirst = false;
     }
 
 
@@ -36,7 +36,7 @@ public class Obstacle : MonoBehaviour
     /// <summary>
     /// 効果発動
     /// </summary>
-    public void Amount()
+    public float Amount(float healthPoint)
     {
         switch (obstacleType)
         {
@@ -46,17 +46,20 @@ public class Obstacle : MonoBehaviour
                     isFirst = false;
                     // ダメージ処理
                     print("固定ダメージ");
-                }
+                    healthPoint -= amount;
 
+                }
                 break;
             case ObstacleType.Duration:
                 if (isFirst)
                 {
                     // 一秒タイマー
                     StartCoroutine(CountDown());
+
+                    // ダメージ処理
+                    print("継続ダメージ");
+                    healthPoint -= amount;
                 }
-
-
                 break;
             case ObstacleType.Heal:
                 if (isFirst)
@@ -64,17 +67,14 @@ public class Obstacle : MonoBehaviour
                     isFirst = false;
                     // 回復処理
                     print("回復");
+                    healthPoint += amount;
                 }
-
-
                 break;
-
-
-
         }
 
 
         print($"isFirst:{isFirst}");
+        return healthPoint;
     }
 
     
@@ -82,13 +82,9 @@ public class Obstacle : MonoBehaviour
     {
         isFirst = false;
 
-        // ダメージ処理
-        print("継続ダメージ");
-
         yield return new WaitForSeconds(1);
         isFirst = true;
         print("1秒経過");
-
     }
 
 
