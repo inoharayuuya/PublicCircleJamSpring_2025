@@ -151,7 +151,7 @@ public class ActionPlayer : PlayerBace
         yield return new WaitForSeconds(0.5f);
         child.SetActive(false);
         child.gameObject.transform.parent = gameObject.transform;
-        //child.transform.localPosition = new Vector2(1f, 0);
+        child.transform.localPosition = new Vector2(1.62f, 0);
         yield return new WaitForSeconds(0.5f);
         attackDelay = false;
         print("çUåÇèIóπ ");
