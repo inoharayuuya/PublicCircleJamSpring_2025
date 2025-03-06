@@ -532,7 +532,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   speed: 5
   healthPoint: 100
+  level: 0
   attackDelay: 0
+  mutekiFlag: 0
 --- !u!1 &651136733
 GameObject:
   m_ObjectHideFlags: 0
@@ -550,7 +552,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &651136734
 Transform:
   m_ObjectHideFlags: 0
@@ -899,7 +901,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   isObstacleDisabled: 0
   amount: 3
-  obstacleType: 1
+  obstacleType: 0
   isFirst: 0
 --- !u!61 &736585869
 BoxCollider2D:

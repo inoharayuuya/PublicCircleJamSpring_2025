@@ -8,9 +8,16 @@ public class ActionPlayer : PlayerBace
 {
     [Tooltip("ë¨ìx")] public float speed;
     [Tooltip("HP")]   public float healthPoint;
+    [Tooltip("Lv")]   public int   level;
+
+
+
 
     GameObject child;
     public bool attackDelay;
+    public bool mutekiFlag;
+
+
 
 
     // Start is called before the first frame update
@@ -39,7 +46,7 @@ public class ActionPlayer : PlayerBace
     private void OnTriggerStay2D(Collider2D collision)
     {
         print("è’ìÀíÜ");
-        if (collision.tag == "Obstacle")
+        if (collision.tag == "Obstacle" && mutekiFlag == false)
         {
             healthPoint = collision.gameObject.GetComponent<Obstacle>().Amount(healthPoint);
             if (collision.gameObject.GetComponent<Obstacle>().isObstacleDisabled == true)
@@ -147,6 +154,11 @@ public class ActionPlayer : PlayerBace
     public void StratJump(float jumpAmount)
     {
         Jump(jumpAmount);
+    }
+
+    public Rigidbody2D GetRigidBody()
+    {
+        return rb;
     }
 
 

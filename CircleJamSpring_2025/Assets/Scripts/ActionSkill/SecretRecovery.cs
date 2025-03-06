@@ -8,9 +8,18 @@ public class SecretRecovery : SkillAction
 {
     public override void Skill()
     {
-        //”é–§‚ÌŒŒ‰t•r‚Å‰ñ•œ 
+        // Œø‰Ê—Ê
         float healAmount = 20f;
-        
-        
+
+        //”é–§‚ÌŒŒ‰t•r‚Å‰ñ•œ 
+        var player = GameObject.Find("ActionPlayer").GetComponent<ActionPlayer>();
+
+        if (player == null)
+        {
+            return;
+        }
+
+        player.healthPoint += healAmount;
+
     }
 }
