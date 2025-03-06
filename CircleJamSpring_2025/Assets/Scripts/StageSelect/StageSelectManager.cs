@@ -679,7 +679,7 @@ public class StageSelectManager : MonoBehaviour
 
             case StageType.Run:
                 print("このステージのタイプはRunです");
-                //Common.LoadScene("Run");
+                Common.LoadScene("Run_Player");
                 break;
         }
     }

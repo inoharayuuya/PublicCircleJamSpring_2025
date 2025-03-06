@@ -33,7 +33,7 @@ public class RunPlayer : PlayerBace
     }
     void Update()
     {
-        Jump();
+        Jump(jumpAmount);
     }
 
     public void InitObstacles()
