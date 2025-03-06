@@ -6,6 +6,11 @@ TagManager:
   tags:
   - Obstacle
   - Ground
+  - Gole
+  - Enemy
+  - Obstacles
+  - Soldier
+  - Trigger
   layers:
   - Default
   - TransparentFX

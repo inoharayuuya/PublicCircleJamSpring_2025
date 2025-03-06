@@ -42,7 +42,7 @@ public class RunHaikei : MonoBehaviour
         {
             var pos = new Vector3(-speed * Time.deltaTime, 0, 0);
             transform.position += pos;
-            distance += pos.x;
+            distance -= pos.x;
             time += Time.deltaTime;
             if (time >= limu)
             {
@@ -54,9 +54,5 @@ public class RunHaikei : MonoBehaviour
                 transform.position = new Vector3(17.7f, 0, 0);
             }
         }
-    }
-    void Hit()
-    {
-        hit_check = true;
     }
 }

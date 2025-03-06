@@ -35,7 +35,7 @@ public class PlayerBace : MonoBehaviour
         {
             if (isInSky == false)
             {
-                rb.velocity = new Vector2(rb.velocity.x, 5);
+                rb.velocity = new Vector2(rb.velocity.x, 8);
                 isInSky = true;
             }
             else if (rb.velocity.magnitude != 0 && isInSky == true && jumpLimit == 1)

@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.SocialPlatforms.Impl;
 
 public class RunPlayer : PlayerBace
 {
@@ -14,17 +15,21 @@ public class RunPlayer : PlayerBace
     [SerializeField] float flashInterval;        //移動スピードと点滅の間隔
     [SerializeField] int loopCount;              //点滅させるときのループのカウント
     public int moveCount;                        //太陽の動いた数
+    public GameObject runStage;
+    public RunHaikei run_haikei;
 
     private Rigidbody2D playerRigidbody;
     private bool moved;                          //1度動かすフラグ
     private bool isMoving;                       //移動中フラグ
     private bool operation;                      //操作可能かのフラグ
     private bool hit;
+    private float score = 0;
 
     private void Start()
     {
         rb = GetComponent<Rigidbody2D>();
         sp = GetComponent<SpriteRenderer>();
+        InitObstacles();
     }
     void Update()
     {
@@ -33,7 +38,7 @@ public class RunPlayer : PlayerBace
 
     public void InitObstacles()
     {
-        //moveCount = 0;     //太陽の動いた数
+        moveCount = 0;     //太陽の動いた数
         moved = false;     //1度動かすフラグ
         isMoving = false;  //移動中フラグ
         operation = false; //操作可能かのフラグ
@@ -41,7 +46,7 @@ public class RunPlayer : PlayerBace
     }
     private void OnTriggerEnter2D(Collider2D collider)
     {
-        //Debug.Log("衝突検知: " + gameObject.name); // 確認用ログ
+        Debug.Log("衝突検知: " + gameObject.name); // 確認用ログ
         if (collider.gameObject.CompareTag("Obstacles") && !moved && !isMoving)
         {
             moved = true;
@@ -84,6 +89,19 @@ public class RunPlayer : PlayerBace
         if (collider.gameObject.CompareTag("Obstacles") || collider.gameObject.CompareTag("Soldier"))
         {
             moved = false; //離れたらフラグをリセット
+        }
+        
+        if (collider.gameObject.CompareTag("Trigger"))
+        {
+            //score = run_haikei.distance * -1;
+            if (score >= 500)
+            {
+                runStage.GetComponent<RunStage>().Goal();
+            }
+            else
+            {
+                runStage.GetComponent<RunStage>().RandomTwoPrefabs();
+            }
         }
     }
 
@@ -139,7 +157,7 @@ public class RunPlayer : PlayerBace
     {
         hit = true;                                         // フラグを当たっている状態に
         collider.enabled = false;                           // 当たり判定をオフ
-        //Debug.Log("無敵時間開始");
+        Debug.Log("無敵時間開始");
 
         for (int i = 0; i < loopCount; i++)
         {
@@ -152,6 +170,6 @@ public class RunPlayer : PlayerBace
 
         hit = false;                                        // フラグを当たっていない状態に
         collider.enabled = true;                            // 当たり判定をオン
-        //Debug.Log("無敵時間終了");
+        Debug.Log("無敵時間終了");
     }
 }
