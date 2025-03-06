@@ -2,7 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 public class EnemyController : MonoBehaviour
-{/*==========================敵の移動変数======================*/
+{/*==========================敵の移動変数==================================*/
+
 	[SerializeField]
 	private float dir = -1.0f;   // 敵の移動方向: 1.0fで右, -1.0fで左.
 	[SerializeField]
@@ -17,9 +18,10 @@ public class EnemyController : MonoBehaviour
 	private float stapoAfterknockbackDuration = 1.0f; // ノックバック後に停止する時間.
 	[SerializeField]
 	private float fallSpeed = 5.0f; //落下速度.
-	/*============================================================*/
 
-	/*=========================視野の変数===================================*/
+	/*========================================================================*/
+
+	/*=========================視野の変数=====================================*/
 	// 自分自身
 	[SerializeField]
 	private Transform self;
@@ -34,7 +36,8 @@ public class EnemyController : MonoBehaviour
 	private float maxDistance = float.PositiveInfinity;
 	[SerializeField]
 	private LayerMask obstaclelayers;//視野を断裂する障害物のレイヤー.
-	/*============================================================*/
+
+	/*==========================================================================*/
 
 	/*==============================プレイヤーを探索============================*/
 
@@ -44,9 +47,11 @@ public class EnemyController : MonoBehaviour
 	private float maxPatoroltime = 5f;
 	[SerializeField]
 	private float patrolRange = 3f;
-	/*============================================================*/
+
+	/*============================================================================*/
 
 	/*==============================地面チェック用変数============================*/
+
 	[SerializeField]
 	private float groundCheckDistance = 0.1f;//地面チェックの距離.
 	[SerializeField]
@@ -54,9 +59,7 @@ public class EnemyController : MonoBehaviour
 	[SerializeField]
 	private LayerMask groundLayer;//地面レイヤー.
 
-
-	/*==========================================================*/
-
+	/*============================================================================*/
 
 	private bool isStopped = false;   // 敵が停止しているかを判定するフラグ.
 	private bool isKnockback = false; // ノックバック中かを判定するフラグ.
@@ -256,6 +259,10 @@ public class EnemyController : MonoBehaviour
 		// プレイヤーと衝突した場合.
 		if (collision.gameObject.CompareTag("Player") && IsVisible())
 		{
+
+			//collision.gameObject.GetComponent<ActionPlayer>().
+
+
 			Debug.Log("当たった!!");
 			// プレイヤーの位置を取得.
 			playerTransform = collision.transform;
