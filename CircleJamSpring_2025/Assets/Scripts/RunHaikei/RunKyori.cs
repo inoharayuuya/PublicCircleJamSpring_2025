@@ -6,7 +6,7 @@ using UnityEngine.UI;
 public class Run_kyori : MonoBehaviour
 {
     public GameObject scortext = null;
-    public float scor = 0;
+    public float score = 0;
     public RunHaikei run_haikei;
     // Start is called before the first frame update
     void Start()
@@ -16,13 +16,13 @@ public class Run_kyori : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        Scor();
+        Score();
     }
-    void Scor()
+    void Score()
     {
         //Run_Haikei run_Haikei = GetComponent<Run_Haikei>();
-        Text scortext = GetComponent<Text>();
-        scor = run_haikei.distance * -1;
-        scortext.text = scor.ToString("0000") + " M";
+        Text scoretext = GetComponent<Text>();
+        score = run_haikei.distance;
+        scoretext.text = score.ToString("0000") + " M";
     }
 }
