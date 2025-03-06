@@ -9,7 +9,6 @@ public class ActionPlayer : PlayerBace
     [Tooltip("速度")] public float speed;
     [Tooltip("HP")]   public float healthPoint;
 
-
     GameObject child;
     public bool attackDelay;
 
@@ -23,7 +22,7 @@ public class ActionPlayer : PlayerBace
     // Update is called once per frame
     void Update()
     {
-        Jump();
+        CheckKey();
         Move();
         Attack();
     }
@@ -76,6 +75,10 @@ public class ActionPlayer : PlayerBace
     {
         rb = GetComponent<Rigidbody2D>();
         child = gameObject.transform.GetChild(0).gameObject;
+
+        jumpAmount = 15f;
+        flightTime = 1f;
+
     }
 
 
@@ -134,4 +137,17 @@ public class ActionPlayer : PlayerBace
     {
         //  スキル選択
     }
+
+
+    public float GetJumpAmount()
+    {
+        return jumpAmount;
+    }
+
+    public void StratJump(float jumpAmount)
+    {
+        Jump(jumpAmount);
+    }
+
+
 }
