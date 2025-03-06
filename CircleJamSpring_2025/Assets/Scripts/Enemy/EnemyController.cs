@@ -61,6 +61,10 @@ public class EnemyController : MonoBehaviour
 
 	/*============================================================================*/
 
+
+	public float soldieAttackDamage = 3.0f;//兵士の攻撃ダメージ.
+	public float soldihealth = 100.0f;//兵士のHP.
+
 	private bool isStopped = false;   // 敵が停止しているかを判定するフラグ.
 	private bool isKnockback = false; // ノックバック中かを判定するフラグ.
 	private bool isPatrolling = true; //パトロール中かを判定.
@@ -136,8 +140,14 @@ public class EnemyController : MonoBehaviour
 				// パトロール
 				Patrol();
 			}
+
+
+			if (soldihealth == 0)
+			{
+				Destroy(this.gameObject);
+			}
 		}
-		
+
 	}
 	/// <summary>
 	/// 地面との接触をチェックする.
@@ -256,19 +266,35 @@ public class EnemyController : MonoBehaviour
 
 	private void OnTriggerEnter2D(Collider2D collision)
 	{
+		
 		// プレイヤーと衝突した場合.
 		if (collision.gameObject.CompareTag("Player") && IsVisible())
 		{
 
-			//collision.gameObject.GetComponent<ActionPlayer>().
+			// プレイヤー側の無敵フラグを参照してフォルスの場合のみ後続の処理を継続させる.
 
+			collision.gameObject.GetComponent<ActionPlayer>().healthPoint -= soldieAttackDamage;
+
+			
 
 			Debug.Log("当たった!!");
 			// プレイヤーの位置を取得.
 			playerTransform = collision.transform;
 			// ノックバック処理を開始.
 			StartCoroutine(KnockbackRoutine());
+
+
+			
 		}
+		//Groundタグのオブジェクトとの衝突を検出.
+		if (collision.gameObject.CompareTag("tcck"))
+		{
+			if (soldihealth == 0)
+			{
+				Destroy(this.gameObject);
+			}
+		}
+
 	}
 	private void OnCollisionEnter2D(Collision2D collision)
 	{
@@ -300,29 +326,31 @@ public class EnemyController : MonoBehaviour
 		}
 	}
 
-		/// <summary>
-		///  移動方向に基づいて向きと視野を更新.
-		/// </summary>
-		private void RotationAndSight()
+	/// <summary>
+	///  移動方向に基づいて向きと視野を更新.
+	/// </summary>
+	private void RotationAndSight()
 	{
-		//向き移動と回転
+		// 向き移動と回転
 		if (dir > 0.1f)
 		{
-			GetComponent<SpriteRenderer>().flipX = true;
-			transform.rotation = Quaternion.Euler(0, 0, 0);
+			// プラス方向に動いているとき (右へ移動)
+			GetComponent<SpriteRenderer>().flipX = false; // flipX をチェックを外す
 
-			//視野の方向の右向きに設定.
+			// 視野の方向の右向きに設定
 			self.right = Vector2.right;
 		}
 		else
 		{
-			GetComponent<SpriteRenderer>().flipX = false;
-			transform.rotation = Quaternion.Euler(0, 180, 0);
-			//視野の方向の左向きに設定.
+			// マイナス方向に動いているとき (左へ移動)
+			GetComponent<SpriteRenderer>().flipX = false; // flipX をチェックする
+
+			// 視野の方向の左向きに設定
 			self.right = Vector2.left;
 		}
-
-	}
+	
+    }
+	
 	private IEnumerator KnockbackRoutine()
 	{
 		// 移動を停止.
