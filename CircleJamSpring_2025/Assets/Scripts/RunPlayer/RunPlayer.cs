@@ -5,40 +5,106 @@ using UnityEngine;
 
 public class RunPlayer : PlayerBace
 {
+    public StartCount start;
     public SpriteRenderer sp;                    //点滅用
-    public Soldier soldier;
     public GameObject sun;                       //動かす太陽
+    private Animator animator;                   //Animatorをキャッシュ
     public Vector3 move = new Vector3(1, 0, 0);  //動かす方向
     public float moveDistance = 1.0f;            //移動距離
     public float moveSpeed = 1.5f;               //移動速度（数値を小さくするとゆっくり）
     [SerializeField] float flashInterval;        //移動スピードと点滅の間隔
     [SerializeField] int loopCount;              //点滅させるときのループのカウント
     public int moveCount;                        //太陽の動いた数
+    public bool isJump;                          //アニメーションジャンプ用
+    public bool gliding;                         //アニメーション滑空用
+    public bool jumpStart;                       //アニメーション対空用
+    public float moveing;                        //アニメーション走り用
+    public float animoveing;
 
-    private Rigidbody2D playerRigidbody;
     private bool moved;                          //1度動かすフラグ
+    private bool animoved;                       //アニメーションを1度動かすフラグ
     private bool isMoving;                       //移動中フラグ
     private bool operation;                      //操作可能かのフラグ
     private bool hit;
 
     private void Start()
     {
+        moveing = 0;
         rb = GetComponent<Rigidbody2D>();
         sp = GetComponent<SpriteRenderer>();
+        animator = GetComponent<Animator>();     //Animatorを取得
+        //start = new StartCount();
+        InitObstacles();
     }
     void Update()
     {
-        Jump();
+        if(operation == false)
+        {
+            Jump();
+        }
+        AnimatorMove();
     }
 
     public void InitObstacles()
     {
         //moveCount = 0;     //太陽の動いた数
         moved = false;     //1度動かすフラグ
+        animoved = false;  //アニメーションを1度動かすフラグ
         isMoving = false;  //移動中フラグ
         operation = false; //操作可能かのフラグ
         hit = false;       //当っている時（点滅）用
     }
+
+    public void AnimatorMove()
+    {
+        if (animator == null)
+        {
+            Debug.LogError("Animator is null in AnimatorMove!");  //Animatorがnullなら処理しない
+            return;
+        }
+
+        // キーが押されたときジャンプ
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+          
+                isJump = true;
+                
+           
+        }
+        else if (rb.velocity.magnitude != 0 && isInSky == true && jumpLimit == 1)
+        {
+            jumpStart = true;  // 対空アニメーションを開始
+            StartCoroutine(ResetJumpStart()); // 一定時間後に jumpStart をオフにする
+        }
+   
+         // 滑空アニメーションの制御
+         if (isInSky && rb.velocity.y < 0 && jumpLimit == 0)  // 空中で下降中なら滑空
+         {
+             gliding = true;
+         }
+         else
+         {
+             gliding = false;
+         }
+
+        if (start.startCountdown <= 0)
+        {
+            moveing = 1f;
+        }
+        animator.SetBool("gliding", gliding);
+        animator.SetBool("jumpStart", jumpStart);
+        animator.SetBool("isJump", isJump);
+        animator.SetFloat("move", moveing);
+        animator.SetFloat("animove", animoveing);
+    }
+    
+    private IEnumerator ResetJumpStart()
+    {
+        // ジャンプ開始アニメーションを一定時間表示するためのコルーチン
+        yield return new WaitForSeconds(0.2f); // 0.2秒後にjumpStartをオフにする
+        jumpStart = false;
+    }
+
     private void OnTriggerEnter2D(Collider2D collider)
     {
         //Debug.Log("衝突検知: " + gameObject.name); // 確認用ログ
@@ -74,6 +140,9 @@ public class RunPlayer : PlayerBace
         print("接地");
         if (collision.gameObject.tag == "Ground")
         {
+            animoved = false;
+            gliding = false;
+            isJump = false;
             isInSky = false;
             jumpLimit = 1;
         }
