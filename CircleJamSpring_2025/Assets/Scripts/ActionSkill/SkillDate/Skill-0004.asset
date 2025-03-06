@@ -16,4 +16,7 @@ MonoBehaviour:
   skillName: "\u7121\u6575"
   skillType: 3
   skillCoolTime: 100
+  unLockSkill: 10
+  coolTime: 0
   skillImage: {fileID: 21300000, guid: 2fc4536dfb86ba845a6aa23fc1a344d2, type: 3}
+  skillAction: {fileID: 0}

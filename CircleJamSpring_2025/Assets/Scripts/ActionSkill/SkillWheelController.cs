@@ -6,7 +6,7 @@ public class SkillWheelController : MonoBehaviour
 {
     public Image[] skillImages;  // スキルアイコンのImage
     public Text skillInfoText;    // 中央のスキル名を表示するText
-    // public Text[] cooldownTexts; // 各スキルのクールタイムを表示するText
+    public Text[] cooldownTexts; // 各スキルのクールタイムを表示するText
     public SkillData[] skillData; // スキルデータ（ScriptableObject）
     private int currentIndex = 2; // 中央のスキル位置
     private bool isRotating = false; // 回転中かどうかのフラグ
@@ -21,6 +21,7 @@ public class SkillWheelController : MonoBehaviour
         {
             initPos[i]=skillImages[i].gameObject.GetComponent<RectTransform>().anchoredPosition;
             skillImages[i].sprite = skillData[i].skillImage;
+            skillData[i].coolTime = 0f;
         }
         StartSkillDisplay();
     }
@@ -48,12 +49,20 @@ public class SkillWheelController : MonoBehaviour
             if (skillData[i].coolTime > 0)
             {
                 skillData[i].coolTime -= Time.deltaTime;
-                // cooldownTexts[i].text = skillData[i].coolTime.ToString("F1"); // クールタイム表示
+                cooldownTexts[i].text = skillData[i].coolTime.ToString("F1");
             }
             else
             {
-                // cooldownTexts[i].text = " "; // クールタイムが終了したら空白
+                if(skillData[i].unLockSkill > 5)
+                {
+                    cooldownTexts[i].text ="X";
+                }
+                else if(skillData[i].coolTime <= 0)
+                {
+                    cooldownTexts[i].text = " "; // クールタイムが終了したら空白
+                }
             }
+
         }
     }
     void RotateWheel(int direction)
@@ -93,6 +102,7 @@ public class SkillWheelController : MonoBehaviour
                 Vector3 targetScale;
 
                 skillImages[i].GetComponent<RectTransform>().anchoredPosition = Vector2.Lerp(startPos[i], initPos[targetIndex], t);
+                // cooldownTexts[i].GetComponent<RectTransform>().anchoredPosition = Vector2.Lerp(startPos[i], initPos[targetIndex], t);
 
                 if (i + direction == currentIndex)
                 {
@@ -113,8 +123,11 @@ public class SkillWheelController : MonoBehaviour
 
                 // 透明度を滑らかに変化
                 Color color = skillImages[i].color;
+                Color textColor = cooldownTexts[i].color;
                 color.a = Mathf.Lerp(startAlphas[i], targetAlpha, t);
+                textColor.a = Mathf.Lerp(startAlphas[i], targetAlpha, t);
                 skillImages[i].color = color;
+                cooldownTexts[i].color = textColor;
 
                 // スケールを滑らかに変化
                 skillImages[i].transform.localScale = Vector3.Lerp(startScales[i], targetScale, t);
@@ -129,38 +142,42 @@ public class SkillWheelController : MonoBehaviour
             // 右スクロール: 最後の要素を先頭に移動
             Image lastImage = skillImages[skillImages.Length - 1];
             SkillData last = skillData[skillData.Length - 1];
+            Text lastText = cooldownTexts[cooldownTexts.Length - 1];
 
             for (int i = skillImages.Length - 1; i > 0; i--)
             {
                 skillImages[i] = skillImages[i - 1];
                 skillData[i] = skillData[i - 1];
+                cooldownTexts[i] = cooldownTexts[i - 1];
             }
 
             skillImages[0] = lastImage;
             skillData[0] = last;
+            cooldownTexts[0] = lastText;
         }
         else if (direction == -1)
         {
             // 左スクロール: 先頭の要素を最後に移動
             Image firstImage = skillImages[0];
             SkillData first = skillData[0];
+            Text firstText = cooldownTexts[0];
 
             for (int i = 0; i < skillImages.Length - 1; i++)
             {
                 skillImages[i] = skillImages[i + 1];
                 skillData[i] = skillData[i + 1];
+                cooldownTexts[i] = cooldownTexts[i + 1];
             }
 
             skillImages[skillImages.Length - 1] = firstImage;
             skillData[skillData.Length - 1] = first;
+            cooldownTexts[cooldownTexts.Length -1] = firstText;
         }
 
         isRotating = false; // 回転終了
 
         UpdateSkillDisplay();
     }
-
-
     void StartSkillDisplay()
     {
         initPos = new Vector3[skillImages.Length];
@@ -169,23 +186,26 @@ public class SkillWheelController : MonoBehaviour
     {
         // 各スキルアイコンの初期位置を設定
         initPos[i] = skillImages[i].GetComponent<RectTransform>().anchoredPosition;
-
+        Color textColor = cooldownTexts[i].color;
         // 中央のスキルアイコンのみ大きく、その他は通常サイズ
         if (i == currentIndex)
         {
             skillImages[i].transform.localScale = new Vector3(1.5f, 1.5f, 1);
             skillImages[i].color = new Color(skillImages[i].color.r, skillImages[i].color.g, skillImages[i].color.b, 1.0f);
+            cooldownTexts[i].color = new Color(skillImages[i].color.r, skillImages[i].color.g, skillImages[i].color.b, 1.0f);
         }
         else if (i == (currentIndex - 1 + skillImages.Length) % skillImages.Length ||
                  i == (currentIndex + 1) % skillImages.Length)
         {
             skillImages[i].transform.localScale = Vector3.one;
             skillImages[i].color = new Color(skillImages[i].color.r, skillImages[i].color.g, skillImages[i].color.b, 0.5f);
+            cooldownTexts[i].color = new Color(skillImages[i].color.r, skillImages[i].color.g, skillImages[i].color.b, 0.5f);
         }
         else
         {
             skillImages[i].transform.localScale = Vector3.one;
             skillImages[i].color = new Color(skillImages[i].color.r, skillImages[i].color.g, skillImages[i].color.b, 0.0f);
+            cooldownTexts[i].color = new Color(skillImages[i].color.r, skillImages[i].color.g, skillImages[i].color.b, 0.0f);
         }
     }
 
@@ -200,20 +220,29 @@ public class SkillWheelController : MonoBehaviour
 
     void ActivateSkill()
     {
-        // 中央のスキルがクールタイム中でなければ発動
-        if (skillData[currentIndex].coolTime <= 0)
+        if(skillData[currentIndex].unLockSkill <= 5)
         {
-            skillData[currentIndex].coolTime = skillData[currentIndex].skillCoolTime; // クールタイム開始
-            skillData[currentIndex].skillAction.Skill();
-            // 発動処理（例: スキルのエフェクトや効果を実行）
-            Debug.Log($"{skillData[currentIndex].skillName} 発動！");
+            // 中央のスキルがクールタイム中でなければ発動
+            if (skillData[currentIndex].coolTime <= 0)
+            {
+                skillData[currentIndex].coolTime = skillData[currentIndex].skillCoolTime; // クールタイム開始
+                skillData[currentIndex].skillAction.Skill();
+                Debug.Log($"{skillData[currentIndex].skillName} 発動！");
+            }
+            else
+            {
+                Debug.Log($"{skillData[currentIndex].skillName} はまだクールタイム中です。");
+            }
         }
         else
         {
-            Debug.Log($"{skillData[currentIndex].skillName} はまだクールタイム中です。");
+            Debug.Log($"{skillData[currentIndex].skillName}はレベルが足りないです。");
         }
 
         // 発動直後にクールタイムを表示する
-        // cooldownTexts[currentIndex].text = skillData[currentIndex].coolTime.ToString("F1");
+        if(skillData[currentIndex].unLockSkill <= 5)
+        {
+            cooldownTexts[currentIndex].text = skillData[currentIndex].coolTime.ToString("F1");
+        }
     }
 }
