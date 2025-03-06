@@ -19,4 +19,4 @@ MonoBehaviour:
   unLockSkill: 10
   coolTime: 0
   skillImage: {fileID: 21300000, guid: 2fc4536dfb86ba845a6aa23fc1a344d2, type: 3}
-  skillAction: {fileID: 0}
+  skillAction: {fileID: 11400000, guid: dabf6a8057d713d4c9eb6447a7317c3b, type: 2}

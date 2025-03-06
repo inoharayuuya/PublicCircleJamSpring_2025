@@ -8,9 +8,16 @@ public class ActionPlayer : PlayerBace
 {
     [Tooltip("ë¨ìx")] public float speed;
     [Tooltip("HP")]   public float healthPoint;
+    [Tooltip("Lv")]   public int   level;
+
+
+
 
     GameObject child;
     public bool attackDelay;
+    public bool mutekiFlag;
+
+
 
 
     // Start is called before the first frame update
@@ -39,7 +46,7 @@ public class ActionPlayer : PlayerBace
     private void OnTriggerStay2D(Collider2D collision)
     {
         print("è’ìÀíÜ");
-        if (collision.tag == "Obstacle")
+        if (collision.tag == "Obstacle" && mutekiFlag == false)
         {
             healthPoint = collision.gameObject.GetComponent<Obstacle>().Amount(healthPoint);
             if (collision.gameObject.GetComponent<Obstacle>().isObstacleDisabled == true)
@@ -74,16 +81,20 @@ public class ActionPlayer : PlayerBace
     void InitActionPlayer()
     {
         rb = GetComponent<Rigidbody2D>();
-        child = gameObject.transform.GetChild(0).gameObject;
+        child = gameObject.transform.GetChild(1).gameObject;
 
         jumpAmount = 15f;
         flightTime = 1f;
-
+        base.Init();
     }
 
 
     void Move()
     {
+        if (!isMove)
+        {
+            return;
+        }
         // à⁄ìÆèàóù
         if (Input.GetKey(KeyCode.D))
         {
@@ -100,9 +111,15 @@ public class ActionPlayer : PlayerBace
 
     void Attack()
     {
+        if (!isMove)
+        {
+            return;
+        }
+
         // çUåÇèàóù
         if (Input.GetMouseButtonDown(0) && attackDelay == false)
         {
+            transform.GetChild(1).localScale = new Vector3(0.4f, 0.4f, 0);
             child.gameObject.transform.parent = null;
             attackDelay = true;
             print("çUåÇ");
@@ -110,6 +127,20 @@ public class ActionPlayer : PlayerBace
             StartCoroutine(NailAttack());
         }
     }
+
+    public void SkillAttack()
+    {
+        child.gameObject.transform.parent = null;
+        attackDelay = true;
+        print("çUåÇ");
+
+        StartCoroutine(NailAttack());
+
+        
+
+    }
+
+
 
     IEnumerator NailAttack()
     {
@@ -120,9 +151,10 @@ public class ActionPlayer : PlayerBace
         yield return new WaitForSeconds(0.5f);
         child.SetActive(false);
         child.gameObject.transform.parent = gameObject.transform;
-        child.transform.localPosition = new Vector2(1f, 0);
+        //child.transform.localPosition = new Vector2(1f, 0);
         yield return new WaitForSeconds(0.5f);
         attackDelay = false;
+        print("çUåÇèIóπ ");
     }
 
 
@@ -148,6 +180,21 @@ public class ActionPlayer : PlayerBace
     {
         Jump(jumpAmount);
     }
+
+    public Rigidbody2D GetRigidBody()
+    {
+        return rb;
+    }
+
+
+    public void SkillGoBad()
+    {
+        StartCoroutine(StayingDown(2));
+    }
+
+
+
+
 
 
 }

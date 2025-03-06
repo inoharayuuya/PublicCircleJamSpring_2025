@@ -8,6 +8,7 @@ public class PlayerBace : MonoBehaviour
     protected float jumpAmount;
     protected float flightTime;
     protected bool isInSky;
+    protected bool isMove;
 
 
     protected Rigidbody2D rb;
@@ -17,14 +18,19 @@ public class PlayerBace : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        
+        Init();
     }
 
     // Update is called once per frame
     void Update()
     {
-        
     }
+
+    protected void Init()
+    {
+        isMove = true;
+    }
+
 
 
 
@@ -47,19 +53,23 @@ public class PlayerBace : MonoBehaviour
         else if (rb.velocity.magnitude != 0 && isInSky == true && jumpLimit == 1)
         {
             jumpLimit = 0;
-            StartCoroutine(StayingDown());
+            StartCoroutine(StayingDown(1));
         }
     }
 
 
 
-    IEnumerator StayingDown()
-    {
+    protected IEnumerator StayingDown(float amount)
+    {   
         print("ëÿãÛäJén");
+        isMove = false;
         rb.gravityScale = 0f;
-        rb.velocity = new Vector2(rb.velocity.x, 0);
+        rb.velocity = Vector3.zero;
+        var speed = 7.5f;
+        rb.velocity = transform.right * speed * amount;
         yield return new WaitForSeconds(1);
         rb.gravityScale = 2.0f;
+        isMove = true;
         print("ëÿãÛèIóπ");
     }
 

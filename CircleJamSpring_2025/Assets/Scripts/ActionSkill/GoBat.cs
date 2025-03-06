@@ -7,6 +7,9 @@ public class GoBat : SkillAction
 {
     public override void Skill()
     {
+        // Œø‰Ê—Ê
+        float moovAmount = 15f;
+
         //ƒRƒEƒ‚ƒŠ‚É•Ïg‚µ‚Ä‰¡ˆÚ“®
         var player = GameObject.Find("ActionPlayer").GetComponent<ActionPlayer>();
 
@@ -15,7 +18,11 @@ public class GoBat : SkillAction
             return;
         }
 
-        //player.rb.velocity = new Vector2(speed, rb.velocity.y);
+
+        player.SkillGoBad();
+
+
+
 
 
     }

@@ -289,7 +289,9 @@ public class EnemyController : MonoBehaviour
 		//Groundタグのオブジェクトとの衝突を検出.
 		if (collision.gameObject.CompareTag("tcck"))
 		{
-			if (soldihealth == 0)
+			soldihealth -= 100;
+
+			if (soldihealth <= 0)
 			{
 				Destroy(this.gameObject);
 			}
