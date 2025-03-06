@@ -66,10 +66,7 @@ public class RunPlayer : PlayerBace
         // キーが押されたときジャンプ
         if (Input.GetKeyDown(KeyCode.Space))
         {
-          
-                isJump = true;
-                
-           
+            isJump = true;
         }
         else if (rb.velocity.magnitude != 0 && isInSky == true && jumpLimit == 1)
         {
