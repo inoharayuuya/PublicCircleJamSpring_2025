@@ -10,7 +10,7 @@ public class ActionPlayer : PlayerBace
     [Tooltip("HP")]   public float healthPoint;
 
 
-    GameObject Child;
+    GameObject child;
     public bool attackDelay;
 
 
@@ -75,7 +75,7 @@ public class ActionPlayer : PlayerBace
     void InitActionPlayer()
     {
         rb = GetComponent<Rigidbody2D>();
-        Child = gameObject.transform.GetChild(0).gameObject;
+        child = gameObject.transform.GetChild(0).gameObject;
     }
 
 
@@ -100,6 +100,7 @@ public class ActionPlayer : PlayerBace
         // çUåÇèàóù
         if (Input.GetMouseButtonDown(0) && attackDelay == false)
         {
+            child.gameObject.transform.parent = null;
             attackDelay = true;
             print("çUåÇ");
 
@@ -109,12 +110,14 @@ public class ActionPlayer : PlayerBace
 
     IEnumerator NailAttack()
     {
-        Child.SetActive(true);
+        child.SetActive(true);
         // çUåÇèàóù
 
 
         yield return new WaitForSeconds(0.5f);
-        Child.SetActive(false);
+        child.SetActive(false);
+        child.gameObject.transform.parent = gameObject.transform;
+        child.transform.localPosition = new Vector2(1f, 0);
         yield return new WaitForSeconds(0.5f);
         attackDelay = false;
     }
