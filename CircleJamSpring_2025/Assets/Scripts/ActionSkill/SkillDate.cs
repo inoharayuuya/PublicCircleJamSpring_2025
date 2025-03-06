@@ -15,6 +15,9 @@ public class SkillData : ScriptableObject
     public Skill skillType;
     [Tooltip("スキルのクールタイム")]
     public float skillCoolTime = 2.0f;
-    [Header("スキルのアイコン")]
+    public float coolTime;
+    [Header("スキルの画像")]
     public Sprite skillImage;
+    [Header("スキルの処理")]
+    public SkillAction skillAction;
 }
