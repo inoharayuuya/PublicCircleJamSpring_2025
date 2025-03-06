@@ -9,6 +9,7 @@ public class StartCount : MonoBehaviour
     public RunPlayer runPlayer;
     public GameObject count = null;   // Textオブジェクト
     public float startCountdown = 3f; //スタートカウントダウン用
+    public RunHaikei runHaikei;
     // Start is called before the first frame update
     void Start()
     {
@@ -34,6 +35,7 @@ public class StartCount : MonoBehaviour
         if (startCountdown <= 0)
         {
             start_text.text = "Start!";
+            runHaikei.isMove = true;
         }
     } 
 }

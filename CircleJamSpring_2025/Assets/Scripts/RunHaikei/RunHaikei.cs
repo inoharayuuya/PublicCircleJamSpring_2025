@@ -12,6 +12,8 @@ public class RunHaikei : MonoBehaviour
     public float acceleration = 3;
     public bool hit_check;
     public int delay = 1000;
+
+    public bool isMove;
     // Start is called before the first frame update
     void Start()
     {
@@ -29,10 +31,16 @@ public class RunHaikei : MonoBehaviour
         distance = 0;
         time = 0;
         hit_check = false;
+        isMove = false;
     }
 
     async void MoveHaikei()
     {
+        if (!isMove)
+        {
+            return;
+        }
+
         if (hit_check == true)
         {
             await Task.Delay(delay);

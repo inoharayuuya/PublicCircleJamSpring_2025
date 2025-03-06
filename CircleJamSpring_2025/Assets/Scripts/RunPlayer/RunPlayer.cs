@@ -40,7 +40,7 @@ public class RunPlayer : PlayerBace
     {
         if(operation == false)
         {
-            Jump();
+            Jump(jumpAmount);
         }
         AnimatorMove();
     }
@@ -60,6 +60,12 @@ public class RunPlayer : PlayerBace
         if (animator == null)
         {
             Debug.LogError("Animator is null in AnimatorMove!");  //Animator‚ªnull‚È‚çˆ—‚µ‚È‚¢
+            return;
+        }
+
+        if (start.startCountdown <= 0)
+        {
+            moveing = 1f;
             return;
         }
 
@@ -84,10 +90,6 @@ public class RunPlayer : PlayerBace
              gliding = false;
          }
 
-        if (start.startCountdown <= 0)
-        {
-            moveing = 1f;
-        }
         animator.SetBool("gliding", gliding);
         animator.SetBool("jumpStart", jumpStart);
         animator.SetBool("isJump", isJump);

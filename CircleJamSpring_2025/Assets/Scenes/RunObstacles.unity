@@ -331,7 +331,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8b430d3eee5e6ef41ba5588ec33618f4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  runPlayer: {fileID: 0}
+  runPlayer: {fileID: 1372895545}
   count: {fileID: 168894350}
   startCountdown: 3
 --- !u!114 &168894353
@@ -737,7 +737,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1793b884784c8c74d8221cc9c0db0888, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  start: {fileID: 168894352}
+  start: {fileID: 0}
   sp: {fileID: 1372895548}
   sun: {fileID: 1866904361}
   move: {x: 1, y: 0, z: 0}
