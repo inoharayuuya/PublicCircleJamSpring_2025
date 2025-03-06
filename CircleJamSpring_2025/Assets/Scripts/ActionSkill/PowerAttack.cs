@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting.FullSerializer;
 using UnityEngine;
 
 [CreateAssetMenu(fileName = "PowerAttack ", menuName = "SkillAction/PowerAttack ")]
@@ -16,9 +17,10 @@ public class PowerAttack : SkillAction
         }
 
         // プレイヤーの攻撃範囲を広げる
-        // スケールを0.4に変更
-
-
+        // スケールを0.6に変更
+        Debug.Log($"test;{player.transform.GetChild(1)}");
+        player.transform.GetChild(1).localScale = new Vector3(0.6f, 0.6f, 0);
+        player.SkillAttack();
 
 
 
