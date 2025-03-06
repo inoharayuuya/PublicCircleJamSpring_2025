@@ -23,7 +23,7 @@ public class RunPlayer : PlayerBace
     private bool isMoving;                       //移動中フラグ
     private bool operation;                      //操作可能かのフラグ
     private bool hit;
-    private float score = 0;
+    private float scor = 0;
 
     private void Start()
     {
@@ -93,8 +93,8 @@ public class RunPlayer : PlayerBace
         
         if (collider.gameObject.CompareTag("Trigger"))
         {
-            //score = run_haikei.distance * -1;
-            if (score >= 500)
+            scor = run_haikei.distance;
+            if (scor >= 500)
             {
                 runStage.GetComponent<RunStage>().Goal();
             }

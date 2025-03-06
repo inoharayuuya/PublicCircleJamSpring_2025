@@ -396,7 +396,7 @@ MonoBehaviour:
   loopCount: 50
   moveCount: 0
   runStage: {fileID: 1664784823}
-  run_haikei: {fileID: 0}
+  run_haikei: {fileID: 1359588425}
 --- !u!1 &557914666
 GameObject:
   m_ObjectHideFlags: 0
@@ -964,6 +964,7 @@ MonoBehaviour:
   - {fileID: 8614608856510736748, guid: 201482c0417636e4d9293e75818dbcb0, type: 3}
   - {fileID: 6922352334432916967, guid: 9036ae003fa8c3240b7ed8ea53d22cdb, type: 3}
   - {fileID: 4191791479928955775, guid: 08c4c9ac651830a4381270bba5ca0324, type: 3}
+  - {fileID: 7196143783712521162, guid: 73a9bedcb38b04b46a6b12544cdaec5d, type: 3}
   - {fileID: 8676902374785296282, guid: 9e668e64bc5d4c04fb8f60d260fccd50, type: 3}
   num: 0
 --- !u!4 &1664784825

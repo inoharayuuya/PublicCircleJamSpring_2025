@@ -28,13 +28,13 @@ public class RunStage : MonoBehaviour
 
     public void RandomTwoPrefabs()
     {
-        num = Random.Range(0, 6);
+        num = Random.Range(0, 7);
         Instantiate(prefabs[num], prefabs[num].transform.position + new Vector3(30, 0, 0), Quaternion.identity);
     }
 
     public void Goal()
     {
-        num = 6;
+        num = 7;
        Instantiate(prefabs[num], prefabs[num].transform.position + new Vector3(30, 0, 0), Quaternion.identity);
     }
 }
