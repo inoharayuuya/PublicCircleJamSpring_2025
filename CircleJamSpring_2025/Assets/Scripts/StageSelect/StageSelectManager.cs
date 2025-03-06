@@ -8,33 +8,46 @@ using Utility;
 public class StageSelectManager : MonoBehaviour
 {
     #region  変数宣言
-    [Tooltip("シーン上のステージ名をセットする親オブジェクト")]
-    [SerializeField] GameObject stageParent;
-
-    [Tooltip("ステージ名のプレハブをセット")]
-    [SerializeField] GameObject stageNamePrefab;
-    
-    [Tooltip("ステージ上に配置するヴァンパイアをセット")]
-    [SerializeField] GameObject vampire;
-
+    [Header("-ステージオブジェクト関連-")]
     [Tooltip("ステージ(赤丸)のプレハブをセット")]
     [SerializeField] GameObject stagePrefab;
 
-    [Tooltip("UIの中心座標をセット")]
-    [SerializeField] GameObject CenterUI;
-    
-    [Tooltip("ステージの横に表示する矢印をセット")]
-    [SerializeField] GameObject[] arrowImages;
-    
     [Tooltip("ステージの間に置く丸のプレハブをセット")]
     [SerializeField] GameObject circle;
 
     [Tooltip("ステージ(赤丸)の実体をセット")]
     GameObject[] stageObject;
 
+    [Tooltip("ステージの座標をセット")]
+    float[] stageNamePos;
+
+    [Header("-ステージ名関連-")]
+    [Tooltip("シーン上のステージ名をセットする親オブジェクト")]
+    [SerializeField] GameObject stageParent;
+
+    [Tooltip("ステージ名のプレハブをセット")]
+    [SerializeField] GameObject stageNamePrefab;
+
+    [Tooltip("UIの中心座標をセット")]
+    [SerializeField] GameObject CenterUI;
+
+    [Tooltip("ステージの横に表示する矢印をセット")]
+    [SerializeField] GameObject[] arrowImages;
+
     [Tooltip("ステージ名オブジェクトをセット")]
     GameObject[] stageNameObject;
 
+    [Tooltip("ステージ名オブジェクトどうしの間をセット")]
+    float[] stageNameSpace;
+
+    [Header("-キャラクター関連-")]
+    [Tooltip("ステージ上に配置するヴァンパイアをセット")]
+    [SerializeField] GameObject vampire;
+
+    [Tooltip("ヴァンパイアのアニメーション")]
+    Animator animator;
+
+    [Header("-カメラ関連-")]
     [Tooltip("カメラのオブジェクトをセット")]
     Camera mainCameraObject;
 
@@ -59,12 +72,6 @@ public class StageSelectManager : MonoBehaviour
     [Tooltip("タップされた座標から押された座標を引いた値をセット")]
     float direction;
 
-    [Tooltip("ステージの座標をセット")]
-    float[] stageNamePos;
-
-    [Tooltip("ステージ名オブジェクトどうしの間をセット")]
-    float[] stageNameSpace;
-
     [Tooltip("カウント用")]
     int count = 0;
 
@@ -74,8 +81,11 @@ public class StageSelectManager : MonoBehaviour
     [Tooltip("現在のステージの中心のインデックスをセット")]
     int stageSpaceIndex = 0;
 
-    [Tooltip("ヴァンパイアのアニメーション")]
-    Animator animator;
+    [Tooltip("ステージクリアされているステージをカウントする用")]
+    int clearCnt;
+
+    [Tooltip("ステージデータをセット")]
+    StageData stageData;
     #endregion
 
     #region Unityデフォルトイベント
@@ -111,48 +121,85 @@ public class StageSelectManager : MonoBehaviour
         speed        = Common.SS_INIT_SPEED;                // 設定した初期スピードで初期化
         startPosTime = Common.SS_START_POS_TIME;            // startPosの値を更新する更新頻度
         direction    = 0;                                   // タップされた点の距離
+        clearCnt     = 0;                                   // クリアしているステージの数
+
+        var jsonStage = Resources.Load<TextAsset>(Common.SS_STAGE_DATA_FILE); // Stage.Jsonから読み込む
+        if (jsonStage != null)
+        {
+            stageData = JsonUtility.FromJson<StageData>(jsonStage.text);
+
+            foreach (var stage in stageData.list_stage)
+            {
+                if (stage.is_stage_clear)
+                {
+                    // クリア済みの場合のみカウントアップ
+                    clearCnt++;
+                }
+
+                // デバッグ用
+                //print($"stage_id: {stage.stage_id}");
+                //print($"stage_name: {stage.stage_name}");
+                //print($"is_stage_clear: {stage.is_stage_clear}");
+                //print($"position: {stage.position}");
+            }
+        }
+        else
+        {
+            // ファイルが見つからなかった場合にエラーログを出す
+            Debug.LogError("JSON file not found!");
+            return;
+        }
+
+        // すべてのステージをクリアしていたらクリアカウントを-1する
+        if (stageData.list_stage.Count == clearCnt)
+        {
+            clearCnt--;
+        }
+
+        // クリアしている数で初期化する
+        stageObject     = new GameObject[clearCnt + 1];
+        stageNameObject = new GameObject[clearCnt + 1];
+        stageNamePos    = new float[clearCnt + 1];
+        stageNameSpace  = new float[clearCnt + 1];
+
+        // ステージはクリアされている分しか表示しないようにする
+        for (int i = 0; i < clearCnt + 1; i++)
+        {
+            // ステージを生成
+            var stage      = Instantiate<GameObject>(stagePrefab, stageData.list_stage[i].position, Quaternion.identity);   // 生成部分
+            stageObject[i] = stage;                                                                                         // 管理しやすくするために配列にセット
+
+            // ステージ名を生成
+            var instance       = Instantiate<GameObject>(stageNamePrefab, stageParent.transform);           // 生成部分
+            stageNameObject[i] = instance;                                                                  // 管理しやすくするために配列にセット
+
+            // ステージ名を変更
+            stageNameObject[i].name = stageData.list_stage[i].stage_name;                                   // ヒエラルキー上の名前を変更
+            stageObject[i].name     = stageData.list_stage[i].stage_name;                                   // ヒエラルキー上の名前を変更
+            stageNameObject[i].GetComponentInChildren<Text>().text = stageData.list_stage[i].stage_name;    // 表示するテキストを変更
+
+            // ステージ名の位置をセット
+            stageNamePos[i] = stageData.list_stage[i].position.x;
+        }
 
         // ステージとキャラ、カメラの座標に使う変数
         var pos = stageObject[0].transform.position;  // ここのstageObjectのインデックスを変えればステージの初期座標が変わる
 
         // ステージの初期値をセット
         var stagePos = stageParent.transform.position;
-        stagePos.x = -pos.x;
+        stagePos.x   = -pos.x;
         stageParent.transform.position = stagePos;
 
-        stageNameObject = new GameObject[Common.SS_MAX_STAGE];
-        stageNamePos = new float[Common.SS_MAX_STAGE];
-        stageNameSpace = new float[Common.SS_MAX_STAGE - 1];
-
-        isTap = false;
+        isTap  = false;
         isMove = false;
 
-        // 全ステージを生成し、ヒエラルキーの名前も変更
-        for (int i = 0; i < Common.SS_MAX_STAGE; i++)
-        {
-            GameObject instance = Instantiate(stageNamePrefab, stageParent.transform);
-            stageNameObject[i] = instance;
-        }
-
-        // 表示するステージ数分表示
-        //for (int i = 0; i < clearCnt + 1; i++)
-        //{
-        //    stageNameObject[i].GetComponentInChildren<Text>().text = stageName[i];
-        //}
-
         // 最初に選択されているステージのα値を変える
+        print($"test:{stageNameObject[0]}");
         stageNameObject[0].GetComponent<Image>().color = Common.MAX_ALPHA;
 
-        // 解放されてないステージ名オブジェクトを非表示にする
-        //for (int i = clearCnt + 1; i < Common.SS_MAX_STAGE; i++)
-        //{
-        //    stageNameObject[i].SetActive(false);
-        //    stageObject[i].SetActive(false);
-        //}
-
         // キャラの初期座標をセット
-        var collegeStudentPos = vampire.transform.position;
-        collegeStudentPos.x = pos.x;
+        var collegeStudentPos      = vampire.transform.position;
+        collegeStudentPos.x        = pos.x;
         vampire.transform.position = collegeStudentPos;
 
         // カメラオブジェクト取得
@@ -160,12 +207,11 @@ public class StageSelectManager : MonoBehaviour
 
         // カメラの初期座標をセット
         var cameraPos = mainCameraObject.transform.position;
-        cameraPos.x = pos.x;
+        cameraPos.x   = pos.x;
         mainCameraObject.transform.position = cameraPos;
 
         // ステージの間の丸を生成
         CreateCircle();
-        //Invoke("CreateCircle", 0.5f);
     }
 
     /// <summary>
@@ -174,75 +220,95 @@ public class StageSelectManager : MonoBehaviour
     void CreateCircle()
     {
         // ステージオブジェクトの間に間隔を持ってcircleを生成
-        //for (int i = 0; i < clearCnt; i++)
-        //{
-        //    var pos = stageObject[i].transform.position;
-        //    var nextPos = stageObject[i + 1].transform.position;
-        //    var distance = pos - nextPos;
+        for (int i = 0; i < clearCnt; i++)
+        {
+            // 距離を計算
+            var pos      = stageObject[i].transform.position;
+            var nextPos  = stageObject[i + 1].transform.position;
+            var distance = pos - nextPos;
 
-        //    var spaceX = Mathf.Abs(distance.x / Common.SS_CIRCLE_SPACE);
-        //    var spaceY = Mathf.Abs(distance.y / Common.SS_CIRCLE_SPACE);
+            // 距離をスペースで割る
+            var spaceX = Mathf.Abs(distance.x / Common.SS_CIRCLE_SPACE);
+            var spaceY = Mathf.Abs(distance.y / Common.SS_CIRCLE_SPACE);
 
-        //    if (spaceX > spaceY)
-        //    {
-        //        spaceY = Mathf.Abs(distance.y / spaceX);
-        //        spaceX = Common.SS_CIRCLE_SPACE;
+            // xとyでどっちの方が離れているか判定
+            if (spaceX > spaceY)
+            {
+                // xを基準で計算する
+                spaceY = Mathf.Abs(distance.y / spaceX);
+                spaceX = Common.SS_CIRCLE_SPACE;
 
-        //        if (distance.y == 0)
-        //        {
-        //            spaceY = Common.SS_CIRCLE_SPACE;
-        //        }
-        //    }
-        //    else if (spaceX < spaceY)
-        //    {
-        //        spaceX = Mathf.Abs(distance.x / spaceY);
-        //        spaceY = Common.SS_CIRCLE_SPACE;
+                // yがスペースで割り切れる場合
+                if (distance.y == 0)
+                {
+                    // スペースで上書き
+                    spaceY = Common.SS_CIRCLE_SPACE;
+                }
+            }
+            else if (spaceX < spaceY)
+            {
+                // yを基準で計算する
+                spaceX = Mathf.Abs(distance.x / spaceY);
+                spaceY = Common.SS_CIRCLE_SPACE;
 
-        //        if (distance.x == 0)
-        //        {
-        //            spaceX = Common.SS_CIRCLE_SPACE;
-        //        }
-        //    }
-        //    else
-        //    {
-        //        spaceX = Common.SS_CIRCLE_SPACE;
-        //        spaceY = Common.SS_CIRCLE_SPACE;
-        //    }
+                // xがスペースで割り切れる場合
+                if (distance.x == 0)
+                {
+                    // スペースで上書き
+                    spaceX = Common.SS_CIRCLE_SPACE;
+                }
+            }
+            else
+            {
+                // 距離が同じ場合
+                spaceX = Common.SS_CIRCLE_SPACE;
+                spaceY = Common.SS_CIRCLE_SPACE;
+            }
 
-        //    int cnt = 0;
-        //    var minDistance = Common.SS_CIRCLE_SPACE;
-        //    while (Mathf.Abs(distance.x) > minDistance || Mathf.Abs(distance.y) > minDistance)
-        //    {
-        //        if (cnt > 100)
-        //        {
-        //            break;
-        //        }
+            int cnt = 0;
+            var minDistance = Common.SS_CIRCLE_SPACE;
 
-        //        if (distance.x > 0)
-        //        {
-        //            pos.x += -spaceX;
-        //            distance.x += -spaceX;
-        //        }
-        //        else if (distance.x < 0)
-        //        {
-        //            pos.x += spaceX;
-        //            distance.x += spaceX;
-        //        }
-        //        if (distance.y > 0)
-        //        {
-        //            pos.y += -spaceY;
-        //            distance.y += -spaceY;
-        //        }
-        //        else if (distance.y < 0)
-        //        {
-        //            pos.y += spaceY;
-        //            distance.y += spaceY;
-        //        }
+            // 点線生成部分
+            while (Mathf.Abs(distance.x) > minDistance || Mathf.Abs(distance.y) > minDistance)
+            {
+                if (cnt > 100)
+                {
+                    // 100個置いてもまだループする場合は離れすぎていると判定する
+                    Debug.LogError("ステージ間が離れすぎています");
+                    break;
+                }
 
-        //        Instantiate(circle, pos, Quaternion.identity);
-        //        cnt++;
-        //    }
-        //}
+                if (distance.x > 0)
+                {
+                    // 距離がプラスの場合
+                    pos.x      += -spaceX;
+                    distance.x += -spaceX;
+                }
+                else if (distance.x < 0)
+                {
+                    // 距離がマイナスの場合
+                    pos.x      += spaceX;
+                    distance.x += spaceX;
+                }
+
+                if (distance.y > 0)
+                {
+                    // 距離がプラスの場合
+                    pos.y      += -spaceY;
+                    distance.y += -spaceY;
+                }
+                else if (distance.y < 0)
+                {
+                    // 距離がマイナスの場合
+                    pos.y      += spaceY;
+                    distance.y += spaceY;
+                }
+
+                // 点線を生成
+                Instantiate(circle, pos, Quaternion.identity);
+                cnt++;
+            }
+        }
     }
 
     /// <summary>
@@ -280,7 +346,7 @@ public class StageSelectManager : MonoBehaviour
             {
                 // startPosTimeの初期化
                 startPosTime = Common.SS_START_POS_TIME;
-                startPos = endPos;
+                startPos     = endPos;
             }
         }
 
@@ -294,8 +360,8 @@ public class StageSelectManager : MonoBehaviour
         // 画面が押されていない間は減速し続ける
         if (!isTap)
         {
+            // 減速率を掛け続ける
             speed *= Common.SS_SLOW_DOWN_SPEED;
-            //direction *= Common.SS_SLOW_DOWN_SPEED;
 
             if (speed < 0.05f || Mathf.Abs(direction) < 50)
             {
@@ -320,8 +386,8 @@ public class StageSelectManager : MonoBehaviour
                     {
                         // 中心の座標を代入
                         stageParent.GetComponent<RectTransform>().localPosition = new Vector3(-stageNamePos[stageIndex],
-                                                                                        stageParent.GetComponent<RectTransform>().localPosition.y,
-                                                                                        stageParent.GetComponent<RectTransform>().localPosition.z);
+                                                                                  stageParent.GetComponent<RectTransform>().localPosition.y,
+                                                                                  stageParent.GetComponent<RectTransform>().localPosition.z);
                     }
 
                     // 止める
@@ -353,24 +419,24 @@ public class StageSelectManager : MonoBehaviour
             else
             {
                 // ステージ名オブジェクトが0以上の時だけ移動する
-                //if (stageNameObject[stageRelease - 1].transform.position.x >= CenterUI.transform.position.x)
-                //{
-                //    stageParent.transform.position += new Vector3((direction * speed), 0, 0) * Time.deltaTime;
-                //}
+                if (stageNameObject[stageNameObject.Length - 1].transform.position.x >= CenterUI.transform.position.x)
+                {
+                    stageParent.transform.position += new Vector3((direction * speed), 0, 0) * Time.deltaTime;
+                }
             }
         }
 
         // 一番近い中心座標のインデックスを取得
         stageSpaceIndex = CheckCenter();
 
-        if (speed < 0.075f)
+        if (speed < Common.SS_MIN_SPEED)
         {
             isMove = false;
-            speed = 0;
+            speed  = 0;
         }
 
         // 中心座標に一番近いオブジェクトの透明度をなしにする
-        stageNameObject[stageSpaceIndex].GetComponent<Image>().color = Common.MAX_ALPHA;
+        stageNameObject[stageSpaceIndex].GetComponent<Image>().color          = Common.MAX_ALPHA;
         stageNameObject[stageSpaceIndex].GetComponentInChildren<Text>().color = new Color(1f, 0.5f, 0, 1f);
 
         // 中心座標に一番近いオブジェクトのサイズを変更する
@@ -384,46 +450,50 @@ public class StageSelectManager : MonoBehaviour
         CameraMove();
 
         // １ステージのみ表示されていた場合
-        //if (stageRelease == 1)
-        //{
-        //    print("矢印off");
-        //    var tmp1 = arrowImages[0].GetComponent<Image>().color;
-        //    tmp1.a = 0f;
-        //    arrowImages[0].GetComponent<Image>().color = tmp1;
+        if (stageNameObject.Length == 1)
+        {
+            print("矢印off");
+            var tmp1 = arrowImages[0].GetComponent<Image>().color;
+            tmp1.a   = Common.MIN_ALPHA.a;
+            arrowImages[0].GetComponent<Image>().color = tmp1;
 
-        //    var tmp2 = arrowImages[0].GetComponent<Image>().color;
-        //    tmp2.a = 0f;
-        //    arrowImages[1].GetComponent<Image>().color = tmp2;
+            var tmp2 = arrowImages[0].GetComponent<Image>().color;
+            tmp2.a   = Common.MIN_ALPHA.a;
+            arrowImages[1].GetComponent<Image>().color = tmp2;
 
-        //    return;
-        //}
+            return;
+        }
 
         if (stageSpaceIndex == 0)
         {
+            // 一番左にいる場合
+            // 左側の矢印を非表示
             var tmp1 = arrowImages[0].GetComponent<Image>().color;
-            tmp1.a = 0;
+            tmp1.a   = Common.MIN_ALPHA.a;
             arrowImages[0].GetComponent<Image>().color = tmp1;
             var tmp2 = arrowImages[1].GetComponent<Image>().color;
-            tmp2.a = 0.5f;
-            arrowImages[1].GetComponent<Image>().color = tmp2;//errorTexts[0].SetActive(false);
+            tmp2.a   = Common.HALF_ALPHA.a;
+            arrowImages[1].GetComponent<Image>().color = tmp2;
         }
-        //else if (stageSpaceIndex == stageRelease - 1)
-        //{
-        //    var tmp1 = arrowImages[0].GetComponent<Image>().color;
-        //    tmp1.a = 0.5f;
-        //    arrowImages[0].GetComponent<Image>().color = tmp1;
-        //    var tmp2 = arrowImages[1].GetComponent<Image>().color;
-        //    tmp2.a = 0;
-        //    arrowImages[1].GetComponent<Image>().color = tmp2;
-        //}
+        else if (stageSpaceIndex == stageNameObject.Length - 1)
+        {
+            // 一番右にいる場合
+            // 右側の矢印を非表示
+            var tmp1 = arrowImages[0].GetComponent<Image>().color;
+            tmp1.a   = Common.HALF_ALPHA.a;
+            arrowImages[0].GetComponent<Image>().color = tmp1;
+            var tmp2 = arrowImages[1].GetComponent<Image>().color;
+            tmp2.a   = Common.MIN_ALPHA.a;
+            arrowImages[1].GetComponent<Image>().color = tmp2;
+        }
         else
         {
+            // それ以外の場合
             var tmp1 = arrowImages[0].GetComponent<Image>().color;
-            tmp1.a = 0.5f;
+            tmp1.a = Common.HALF_ALPHA.a;
             arrowImages[0].GetComponent<Image>().color = tmp1;
-
             var tmp2 = arrowImages[1].GetComponent<Image>().color;
-            tmp2.a = 0.5f;
+            tmp2.a = Common.HALF_ALPHA.a;
             arrowImages[1].GetComponent<Image>().color = tmp2;
         }
     }
@@ -482,11 +552,13 @@ public class StageSelectManager : MonoBehaviour
 
         if (MathF.Abs(direction.x) > limit || MathF.Abs(direction.y) > limit)
         {
-            animator.SetBool("isRun", true);
+            // 移動中なのでアニメーションを再生する
+            //animator.SetBool("isRun", true);
         }
         else
         {
-            animator.SetBool("isRun", false);
+            // 移動していないのでアニメーションを終了する
+            //animator.SetBool("isRun", false);
         }
     }
 
@@ -578,7 +650,7 @@ public class StageSelectManager : MonoBehaviour
             // 各ステージ名オブジェクトの距離を判定、sumより小さければsumを書き換える
             if (Mathf.Abs(sum) > stageDirection)
             {
-                sum = stageDirection;
+                sum   = stageDirection;
                 index = i;
             }
         }
@@ -592,11 +664,24 @@ public class StageSelectManager : MonoBehaviour
     public void TapReadyButton()
     {
         // BGMをストップする
-        //SoundManager.smInstance.StopBGM();
 
         // SEを再生
-        //AudioClip clip = LoadSE("se_battle_start");
-        //audioSource.volume = 0.25f;
-        //audioSource.PlayOneShot(clip);
+
+        // 現在選択中のステージを取得する
+        print($"選択したステージ名: {stageData.list_stage[stageIndex].stage_name}");
+        print($"選択したステージのクリア状況: {stageData.list_stage[stageIndex].is_stage_clear}");
+
+        switch (stageData.list_stage[stageIndex].stage_type)
+        {
+            case StageType.Action:
+                print("このステージのタイプはActionです");
+                //Common.LoadScene("Action");
+                break;
+
+            case StageType.Run:
+                print("このステージのタイプはRunです");
+                //Common.LoadScene("Run");
+                break;
+        }
     }
 }

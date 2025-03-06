@@ -1,13 +1,14 @@
 using UnityEditor;
 using UnityEngine;
 using System.IO;
+using Utility;
 
 public class StageDataEditor : EditorWindow
 {
-    private StageData stageData = new StageData();
-    private string savePath = "Assets/Resources/Json/StageData.json"; // JSONの保存先
-    private Vector2 scrollPosition; // スクロール用
-    private int stageToRemove = -1; // 削除するステージのインデックス
+    StageData stageData = new StageData();
+    string savePath = "Assets/Resources/Json/StageData.json"; // JSONの保存先
+    Vector2 scrollPosition; // スクロール用
+    int stageToRemove = -1; // 削除するステージのインデックス
 
     [MenuItem("Tools/Stage Data Editor")]
     public static void ShowWindow()
@@ -46,8 +47,9 @@ public class StageDataEditor : EditorWindow
             // 入力部分
             stageData.list_stage[i].stage_id = EditorGUILayout.TextField("Stage ID", stageData.list_stage[i].stage_id);
             stageData.list_stage[i].stage_name = EditorGUILayout.TextField("Stage Name", stageData.list_stage[i].stage_name);
-            stageData.list_stage[i].is_stage_clear = EditorGUILayout.Toggle("Stage Clear", stageData.list_stage[i].is_stage_clear);
-            
+            stageData.list_stage[i].stage_type = (StageType)EditorGUILayout.EnumPopup("Stage Type", stageData.list_stage[i].stage_type);
+            //stageData.list_stage[i].is_stage_clear = EditorGUILayout.Toggle("Stage Clear", stageData.list_stage[i].is_stage_clear);
+
             GUILayout.Label("Stage Position"); 
             var x = float.Parse(EditorGUILayout.TextField("    x", stageData.list_stage[i].position.x.ToString()));
             var y = float.Parse(EditorGUILayout.TextField("    y", stageData.list_stage[i].position.y.ToString()));

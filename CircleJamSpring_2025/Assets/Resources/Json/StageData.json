@@ -1,14 +1,37 @@
 {
     "list_stage": [
         {
-            "stage_id": "1",
-            "stage_name": "test",
-            "is_stage_clear": false
+            "stage_id": "stage-0001",
+            "stage_name": "チュートリアル",
+            "is_stage_clear": true,
+            "stage_type": 1,
+            "position": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            }
         },
         {
-            "stage_id": "2",
-            "stage_name": "test",
-            "is_stage_clear": false
+            "stage_id": "stage-0002",
+            "stage_name": "stage2",
+            "is_stage_clear": true,
+            "stage_type": 0,
+            "position": {
+                "x": 3.0,
+                "y": 0.0,
+                "z": 0.0
+            }
+        },
+        {
+            "stage_id": "stage-0003",
+            "stage_name": "stage3",
+            "is_stage_clear": true,
+            "stage_type": 1,
+            "position": {
+                "x": 6.0,
+                "y": 0.0,
+                "z": 0.0
+            }
         }
     ]
 }
