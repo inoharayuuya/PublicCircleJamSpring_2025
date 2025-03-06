@@ -28,23 +28,30 @@ public class PlayerBace : MonoBehaviour
 
 
 
-    protected void Jump()
+    protected void CheckKey()
     {
         // キーが押されたときジャンプ
         if (Input.GetKeyDown(KeyCode.Space))
         {
-            if (isInSky == false)
-            {
-                rb.velocity = new Vector2(rb.velocity.x, 5);
-                isInSky = true;
-            }
-            else if (rb.velocity.magnitude != 0 && isInSky == true && jumpLimit == 1)
-            {
-                jumpLimit = 0;
-                StartCoroutine(StayingDown());
-            }
+            Jump(jumpAmount);
         }
     }
+
+    protected void Jump(float jumpAmount)
+    {
+        if (isInSky == false)
+        {
+            rb.velocity = new Vector2(rb.velocity.x, jumpAmount);
+            isInSky = true;
+        }
+        else if (rb.velocity.magnitude != 0 && isInSky == true && jumpLimit == 1)
+        {
+            jumpLimit = 0;
+            StartCoroutine(StayingDown());
+        }
+    }
+
+
 
     IEnumerator StayingDown()
     {
@@ -52,9 +59,8 @@ public class PlayerBace : MonoBehaviour
         rb.gravityScale = 0f;
         rb.velocity = new Vector2(rb.velocity.x, 0);
         yield return new WaitForSeconds(1);
-        rb.gravityScale = 1.0f;
+        rb.gravityScale = 2.0f;
         print("滞空終了");
     }
-
 
 }
