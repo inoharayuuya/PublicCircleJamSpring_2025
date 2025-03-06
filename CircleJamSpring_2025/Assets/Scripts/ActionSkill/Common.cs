@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace Utility
 {
@@ -12,8 +13,34 @@ namespace Utility
         Muteki,         //なんか無敵になる
         PowerAttack     //めっちゃ強い攻撃
     }
+
+    public enum StageType
+    {
+        Run,
+        Action
+    }
     class Common
     {
+        public const int    SS_MAX_STAGE       = 48;     // マックスのステージ数
+        public const float  SS_CAMERA_SPEED    = 10f;    // カメラの移動スピード
+        public const float  SS_CHARA_SPEED     = 2.5f;   // キャラクターの移動スピード
+        public const float  SS_INIT_SUM        = 10000f; // sumの初期値
+        public const float  SS_SLOW_DOWN_SPEED = 0.97f;  // 減速率
+        public const float  SS_MIN_SPEED       = 0.05f;  // スピードの最小値
+        public const float  SS_DIRECTION_SPEED = 1000f;  // ステージ名オブジェクトをステージ名の中心まで動かす時のスピード
+        public const float  SS_START_POS_TIME  = 0.1f;   // startPosの更新頻度
+        public const float  SS_INIT_SPEED      = 0.5f;   // スピードの初期値
+        public const float  SS_CIRCLE_SPACE    = 0.5f;   // 生成するcircleの間隔
 
+        public const string SS_STAGE_DATA_FILE = "Json/StageData";  // ステージデータのファイル名(JSON)
+
+        public static Color HALF_ALPHA         = new Color(1.0f, 1.0f, 1.0f, 0.5f);    // 半透明
+        public static Color MAX_ALPHA          = new Color(1.0f, 1.0f, 1.0f, 1.0f);    // 不透明
+        public static Color MIN_ALPHA          = new Color(1.0f, 1.0f, 1.0f, 0.0f);    // 透明
+
+        public static void LoadScene(string _sceneName)
+        {
+            SceneManager.LoadScene(_sceneName);
+        }
     }
 }
