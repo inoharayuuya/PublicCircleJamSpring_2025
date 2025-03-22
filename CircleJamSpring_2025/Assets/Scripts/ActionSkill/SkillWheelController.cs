@@ -53,7 +53,7 @@ public class SkillWheelController : MonoBehaviour
             }
             else
             {
-                if(skillData[i].unLockSkill > 5)
+                if(skillData[i].unLockSkill > 11)
                 {
                     cooldownTexts[i].text ="X";
                 }
@@ -220,7 +220,7 @@ public class SkillWheelController : MonoBehaviour
 
     void ActivateSkill()
     {
-        if(skillData[currentIndex].unLockSkill <= 5)
+        if(skillData[currentIndex].unLockSkill <= 11)
         {
             // 中央のスキルがクールタイム中でなければ発動
             if (skillData[currentIndex].coolTime <= 0)
